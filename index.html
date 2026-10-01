@@ -1,0 +1,335 @@
+<!doctype html>
+<!--
+  FRAMEROOM — movie & web series hub (single-file SPA, no build step)
+  SETUP: Paste your TMDB API key (v3) into CFG.KEY below.
+-->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Frameroom — Movies & Web Series</title>
+<meta name="description" content="Trending movies, new releases and top web series — ratings, trailers and where to watch.">
+<meta name="google-site-verification" content="YOUR_SEARCH_CONSOLE_TOKEN">
+<meta property="og:type" content="website"><meta property="og:site_name" content="Frameroom">
+<meta property="og:title" content="Frameroom — Movies & Web Series"><meta property="og:description" content="Find what to watch tonight.">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="canonical" href="/" id="canon">
+<link rel="preconnect" href="https://image.tmdb.org"><link rel="preconnect" href="https://api.themoviedb.org">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;600&family=Big+Shoulders+Display:wght@800;900&display=swap" rel="stylesheet">
+<script type="application/ld+json" id="ld"></script>
+<style>
+:root{--bg:#0a0e1a;--s1:#131a2e;--s2:#1c2540;--tx:#eef1f8;--mu:#9aa5c2;--ac:#ff5b3a;--gold:#ffc24b;--r:10px;
+--hd:'Big Shoulders Display','Impact',sans-serif;--bd:'Archivo',system-ui,sans-serif}
+*{box-sizing:border-box;margin:0}html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--tx);font:16px/1.55 var(--bd);padding-bottom:64px}
+a{color:inherit;text-decoration:none}img{max-width:100%;display:block}
+:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
+h1,h2,h3{font-family:var(--hd);font-weight:900;line-height:1;letter-spacing:.01em}
+h1{font-size:clamp(2.6rem,11vw,5.5rem)}h2{font-size:1.9rem;margin:0 0 .8rem}
+.w{width:min(1200px,100% - 2rem);margin-inline:auto}section{margin:2.2rem 0}
+header{position:sticky;top:0;z-index:20;background:rgba(10,14,26,.92);backdrop-filter:blur(8px)}
+header .w{display:flex;align-items:center;gap:1rem;height:56px}
+.logo{font:900 1.7rem var(--hd);color:var(--ac)}
+#sf{flex:1;display:flex}#sf input{flex:1;min-width:0;background:var(--s1);border:1px solid var(--s2);color:var(--tx);padding:.5rem .9rem;border-radius:99px}
+nav.tabs{position:fixed;bottom:0;inset-inline:0;z-index:20;display:flex;background:var(--s1);border-top:1px solid var(--s2)}
+nav.tabs a{flex:1;text-align:center;padding:.8rem 0;font-size:.85rem;color:var(--mu)}nav.tabs a.on{color:var(--gold);font-weight:600}
+@media(min-width:800px){body{padding:0}nav.tabs{position:static;background:none;border:0;width:auto}nav.tabs a{padding:0 .8rem}header .w{height:64px}}
+.hero{position:relative;min-height:72vh;display:flex;align-items:flex-end;background:#000 center/cover;margin-bottom:0}
+.hero::after{content:"";position:absolute;inset:0;background:linear-gradient(0deg,var(--bg) 4%,rgba(10,14,26,.55) 55%,rgba(10,14,26,.2))}
+.hero .w{position:relative;z-index:1;padding:0 0 2rem;animation:up .8s both}
+.hero p{max-width:60ch;color:#d5dbee;margin:.8rem 0 1.2rem;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+@keyframes up{from{opacity:0;transform:translateY(18px)}}
+.btn{display:inline-block;border:0;cursor:pointer;background:var(--ac);color:#fff;font:600 .95rem var(--bd);padding:.7rem 1.2rem;border-radius:8px;margin:0 .4rem .4rem 0}
+.btn.g{background:var(--s2)}.btn:hover{filter:brightness(1.15)}
+.row{display:flex;gap:.8rem;overflow-x:auto;scroll-snap-type:x mandatory;padding-bottom:.6rem}
+.row .card{flex:0 0 130px;scroll-snap-align:start}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:1rem}
+.card{position:relative;display:block;transition:transform .25s}
+.card img{aspect-ratio:2/3;object-fit:cover;background:var(--s1);border-radius:var(--r);transition:box-shadow .25s}
+.card:hover{transform:translateY(-6px)}.card:hover img{box-shadow:0 12px 28px #000a}
+.card b{display:block;font-size:.9rem;margin-top:.4rem;line-height:1.25}.card small{color:var(--mu)}
+.rt{position:absolute;top:6px;left:6px;background:#000b;color:var(--gold);font-size:.75rem;font-weight:600;padding:2px 7px;border-radius:99px}
+@media(min-width:800px){.row .card{flex-basis:170px}.grid{grid-template-columns:repeat(auto-fill,minmax(170px,1fr))}}
+.chips{display:flex;gap:.5rem;overflow-x:auto;padding-bottom:.4rem}
+.chip{white-space:nowrap;background:var(--s1);border:1px solid var(--s2);padding:.4rem .9rem;border-radius:99px;font-size:.9rem}.chip:hover{border-color:var(--ac)}
+.det{display:grid;gap:1.4rem}.det .po{width:min(240px,60%);border-radius:var(--r)}
+@media(min-width:800px){.det{grid-template-columns:280px 1fr}.det .po{width:100%}}
+.meta{color:var(--mu);display:flex;flex-wrap:wrap;gap:.4rem 1rem;margin:.5rem 0 1rem}.meta .sc{color:var(--gold);font-weight:600}
+.cast .p{flex:0 0 96px;font-size:.8rem;scroll-snap-align:start}.cast img{aspect-ratio:1;object-fit:cover;border-radius:50%;margin-bottom:.3rem;background:var(--s1)}
+.tr{position:relative;aspect-ratio:16/9;background:#000 center/cover;border-radius:var(--r);cursor:pointer;display:grid;place-items:center;border:0;width:100%}
+.tr span{background:var(--ac);padding:.8rem 1.4rem;border-radius:99px;font-weight:600;color:#fff}
+iframe{width:100%;aspect-ratio:16/9;border:0;border-radius:var(--r)}
+.prov{display:flex;gap:.6rem;flex-wrap:wrap}.prov img{width:48px;height:48px;border-radius:10px}
+.stars button{background:none;border:0;font-size:1.8rem;color:var(--s2);cursor:pointer}.stars button.on{color:var(--gold)}
+.share a,.share button{display:inline-block;background:var(--s1);border:1px solid var(--s2);color:var(--tx);padding:.4rem .8rem;border-radius:8px;margin:0 .3rem .3rem 0;font:.85rem var(--bd);cursor:pointer}
+.f{display:grid;gap:.6rem;grid-template-columns:repeat(2,1fr);margin-bottom:1.2rem}
+input,select,textarea{background:var(--s1);border:1px solid var(--s2);color:var(--tx);padding:.6rem;border-radius:8px;font:inherit;width:100%}
+.ad{background:repeating-linear-gradient(45deg,var(--s1),var(--s1) 10px,#161e36 10px,#161e36 20px);color:var(--mu);text-align:center;padding:1.4rem;border-radius:var(--r);font-size:.8rem;margin:1.5rem 0}
+.txt{max-width:70ch}.txt p,.txt li{margin-bottom:.9rem;color:#d5dbee}.cm{background:var(--s1);padding:.7rem 1rem;border-radius:8px;margin-bottom:.6rem}.cm small{color:var(--mu)}
+ol.t10{list-style:none;counter-reset:n;padding:0}ol.t10 li{counter-increment:n;display:flex;gap:1rem;align-items:center;padding:.5rem 0;border-bottom:1px solid var(--s2)}
+ol.t10 li::before{content:counter(n);font:900 2.2rem var(--hd);color:var(--ac);width:2.2rem}
+.cal li{list-style:none;display:flex;gap:1rem;padding:.4rem 0;border-bottom:1px solid var(--s2)}.cal time{color:var(--gold);flex:0 0 5.5rem}
+footer{border-top:1px solid var(--s2);padding:2rem 0;color:var(--mu);font-size:.9rem}footer a{margin-right:1rem}
+.nl{display:flex;gap:.5rem;margin:.8rem 0}.nl input{flex:1}
+#pop{position:fixed;inset:0;background:#000c;z-index:50;display:none;place-items:center;padding:1rem}#pop.on{display:grid}
+#pop div{background:var(--s1);padding:1.6rem;border-radius:14px;max-width:420px;width:100%}
+.msg{padding:3rem 0;text-align:center;color:var(--mu)}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important;scroll-behavior:auto}}
+</style>
+</head>
+<body>
+<header><div class="w">
+  <a class="logo" href="/" data-l>FRAMEROOM</a>
+  <form id="sf" role="search"><input name="q" type="search" placeholder="Search movies & series" aria-label="Search"></form>
+  <nav class="tabs" id="nav">
+    <a href="/" data-l>Home</a><a href="/browse" data-l>Browse</a><a href="/blog" data-l>News</a><a href="/watchlist" data-l>Watchlist</a>
+  </nav>
+</div></header>
+
+<main id="app" class="w"></main>
+
+<footer><div class="w">
+  <b>Get weekly picks and release alerts</b>
+  <form class="nl" data-nl><input type="email" required placeholder="you@email.com" aria-label="Email"><button class="btn">Subscribe</button></form>
+  <button class="btn g" id="push">Turn on release notifications</button>
+  <p style="margin:1rem 0">
+    <a href="/about" data-l>About</a><a href="/contact" data-l>Contact</a><a href="/privacy" data-l>Privacy</a><a href="/dmca" data-l>DMCA</a>
+  </p>
+  <p>This product uses the TMDB API but is not endorsed or certified by TMDB. Streaming availability via JustWatch through TMDB.</p>
+</div></footer>
+
+<div id="pop" role="dialog" aria-modal="true" aria-labelledby="pt"><div>
+  <h2 id="pt">Never miss a good one</h2>
+  <p>One email a week: new releases, hidden gems and where to stream them.</p>
+  <form class="nl" data-nl><input type="email" required placeholder="you@email.com" aria-label="Email"><button class="btn">Join</button></form>
+  <button class="btn g" id="x">Not now</button>
+</div></div>
+
+<script>
+/* ================= CONFIG ================= */
+const CFG={
+  KEY:'YOUR_TMDB_API_KEY',
+  REGION:'US',
+  GA:'G-XXXXXXXXXX',
+  NEWSLETTER:'',
+  CONTACT:'https://formspree.io/f/YOUR_ID',
+  AFFILIATE:''
+};
+const IMG='https://image.tmdb.org/t/p/',SITE=location.origin;
+const PH='data:image/svg+xml,'+encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="342" height="513"><rect width="100%" height="100%" fill="#131a2e"/></svg>');
+
+/* ================= HELPERS ================= */
+const $=(s,r=document)=>r.querySelector(s),app=$('#app');
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const slug=s=>s.toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'');
+const ls=(k,d)=>{try{return JSON.parse(localStorage.getItem(k))??d}catch{return d}};
+const save=(k,v)=>{try{localStorage.setItem(k,JSON.stringify(v))}catch{}};
+const cache=new Map();
+const api=async(p,q={})=>{
+  const u=`https://api.themoviedb.org/3${p}?`+new URLSearchParams({api_key:CFG.KEY,language:'en-US',...q});
+  if(cache.has(u))return cache.get(u);
+  const r=await fetch(u);if(!r.ok)throw new Error(r.status);
+  const j=await r.json();cache.set(u,j);return j;
+};
+const year=m=>(m.release_date||m.first_air_date||'').slice(0,4);
+const card=(m,t)=>{t=m.media_type||t;const n=m.title||m.name;
+  return `<a class="card" href="/${t}/${m.id}-${slug(n)}" data-l><img loading="lazy" decoding="async" width="342" height="513" src="${m.poster_path?IMG+'w342'+m.poster_path:PH}" alt="${esc(n)} poster"><span class="rt">★ ${(m.vote_average||0).toFixed(1)}</span><b>${esc(n)}</b><small>${year(m)}</small></a>`};
+const rowSec=(h,items,t,more)=>`<section><h2>${h}${more?` <a class="chip" href="${more}" data-l style="font:600 .8rem var(--bd);vertical-align:middle">See all</a>`:''}</h2><div class="row">${items.map(m=>card(m,t)).join('')}</div></section>`;
+const AD=l=>`<div class="ad" data-slot="${l}">Ad space — ${l} (paste AdSense / affiliate code here)</div>`;
+
+/* ================= SEO: meta + schema ================= */
+function setMeta({title,desc,img,path,ld}){
+  document.title=title;const set=(sel,attr,v)=>{let e=$(sel);if(!e){e=document.createElement('meta');e.setAttribute(sel.includes('og:')?'property':'name',sel.match(/"(.+)"/)[1]);document.head.append(e)}e.setAttribute(attr,v)};
+  const url=SITE+(path||location.pathname);
+  set('meta[name="description"]','content',desc);set('meta[property="og:title"]','content',title);set('meta[property="og:description"]','content',desc);
+  set('meta[property="og:url"]','content',url);set('meta[property="og:image"]','content',img||'');
+  $('#canon').href=url;$('#ld').textContent=ld?JSON.stringify(ld):'';
+}
+if(!CFG.GA.includes('XXXX')){const s=document.createElement('script');s.async=1;s.src='https://www.googletagmanager.com/gtag/js?id='+CFG.GA;document.head.append(s);
+  window.dataLayer=[];window.gtag=function(){dataLayer.push(arguments)};gtag('js',new Date());gtag('config',CFG.GA,{send_page_view:false})}
+const track=(n,p)=>window.gtag&&gtag('event',n,p);
+
+/* ================= WATCHLIST ================= */
+const wl=()=>ls('wl',[]);
+const inWl=(t,id)=>wl().some(x=>x.t===t&&x.id===id);
+function toggleWl(t,id,title,poster,y){let l=wl();inWl(t,id)?l=l.filter(x=>!(x.t===t&&x.id===id)):l.push({t,id,title,poster,y});save('wl',l);track('watchlist_toggle',{title})}
+
+/* ================= GENRES ================= */
+let GEN;const genres=async()=>GEN||(GEN=Promise.all([api('/genre/movie/list'),api('/genre/tv/list')]).then(([a,b])=>{const m=new Map();[...a.genres,...b.genres].forEach(g=>m.set(g.id,g.name));return m}));
+const chips=async()=>`<div class="chips">${[...(await genres())].map(([id,n])=>`<a class="chip" href="/browse?genre=${id}" data-l>${esc(n)}</a>`).join('')}</div>`;
+
+/* ================= PAGES ================= */
+async function home(){
+  const [tr,nw,tv]=await Promise.all([api('/trending/all/week'),api('/movie/now_playing',{region:CFG.REGION}),api('/tv/top_rated')]);
+  const h=tr.results.find(x=>x.backdrop_path),t=h.media_type,n=h.title||h.name;
+  const vid=(await api(`/${t}/${h.id}/videos`)).results.find(v=>v.site==='YouTube'&&v.type==='Trailer');
+  setMeta({title:'Frameroom — Movies & Web Series: Trending, New Releases, Where to Watch',desc:'Discover trending movies, new releases and top web series with ratings, trailers and streaming links.',img:IMG+'w780'+h.backdrop_path});
+  app.innerHTML=`
+  <div class="hero" style="margin-inline:calc(50% - 50vw);width:100vw;background-image:url(${IMG}w1280${h.backdrop_path})"><div class="w">
+    <h1>${esc(n)}</h1><p>${esc(h.overview)}</p>
+    ${vid?`<button class="btn" data-trailer="${vid.key}">▶ Watch trailer</button>`:''}
+    <a class="btn g" href="/${t}/${h.id}-${slug(n)}" data-l>Details</a></div></div>
+  <section><h2>Browse by genre</h2>${await chips()}</section>
+  ${rowSec('Trending now',tr.results,null)}${AD('home-banner')}
+  ${rowSec('New releases',nw.results,'movie','/browse?type=movie&sort=primary_release_date.desc')}
+  ${rowSec('Top web series',tv.results,'tv','/browse?type=tv&rating=8')}`;
+}
+
+async function detail(t,id){
+  const d=await api(`/${t}/${id}`,{append_to_response:'videos,credits,recommendations,similar,watch/providers'});
+  const n=d.title||d.name,y=year(d),tr=d.videos.results.find(v=>v.site==='YouTube'&&v.type==='Trailer');
+  const pv=(d['watch/providers'].results||{})[CFG.REGION]||{},cast=d.credits.cast.slice(0,12);
+  const rel=[...d.recommendations.results,...d.similar.results].filter((m,i,a)=>a.findIndex(z=>z.id===m.id)===i&&m.poster_path).slice(0,14);
+  const key=t+id,url=SITE+location.pathname;
+  setMeta({title:`${n} (${y}) — Rating, Cast, Trailer & Where to Watch | Frameroom`,desc:(d.overview||'').slice(0,155),img:IMG+'w780'+(d.backdrop_path||d.poster_path),
+    ld:{'@context':'https://schema.org','@type':t==='tv'?'TVSeries':'Movie',name:n,description:d.overview,image:IMG+'w500'+d.poster_path,
+      [t==='tv'?'startDate':'datePublished']:d.release_date||d.first_air_date,genre:d.genres.map(g=>g.name),
+      aggregateRating:{'@type':'AggregateRating',ratingValue:d.vote_average.toFixed(1),ratingCount:d.vote_count,bestRating:10},
+      actor:cast.map(c=>({'@type':'Person',name:c.name}))}});
+  const my=ls('r:'+key,0),cms=ls('c:'+key,[]);
+  const enc=encodeURIComponent,sh=`${enc(url)}&text=${enc(n+' — where to watch')}`;
+  const link=pv.link?pv.link+CFG.AFFILIATE:'#';
+  app.innerHTML=`<section class="det">
+    <img class="po" src="${d.poster_path?IMG+'w500'+d.poster_path:PH}" alt="${esc(n)} poster" width="500" height="750">
+    <div><h1>${esc(n)}</h1>
+      <div class="meta"><span class="sc">★ ${d.vote_average.toFixed(1)}/10</span><span>${y}</span><span>${t==='tv'?d.number_of_seasons+' seasons':(d.runtime||'?')+' min'}</span><span>${d.genres.map(g=>esc(g.name)).join(', ')}</span></div>
+      <p class="txt">${esc(d.overview||'No synopsis yet.')}</p>
+      <button class="btn" data-wl='${JSON.stringify([t,id,n,d.poster_path,y])}'>${inWl(t,id)?'✓ In watchlist':'+ Watchlist'}</button>
+      <div class="share" style="margin-top:.8rem"><a target="_blank" rel="noopener" href="https://twitter.com/intent/tweet?url=${sh}">Post</a>
+      <a target="_blank" rel="noopener" href="https://www.facebook.com/sharer/sharer.php?u=${enc(url)}">Facebook</a>
+      <a target="_blank" rel="noopener" href="https://wa.me/?text=${sh}">WhatsApp</a><button data-share="${esc(n)}">Share / copy link</button></div></div></section>
+  <section><h2>Where to watch (${CFG.REGION})</h2>
+    ${['flatrate','rent','buy'].filter(k=>pv[k]).map(k=>`<p class="meta">${{flatrate:'Stream',rent:'Rent',buy:'Buy'}[k]}</p><div class="prov">${pv[k].map(p=>`<a href="${link}" target="_blank" rel="noopener sponsored" title="${esc(p.provider_name)}"><img loading="lazy" src="${IMG}w92${p.logo_path}" alt="${esc(p.provider_name)}"></a>`).join('')}</div>`).join('')||'<p class="meta">No streaming info for your region yet.</p>'}</section>
+  ${tr?`<section><h2>Trailer</h2><button class="tr" style="background-image:url(https://i.ytimg.com/vi/${tr.key}/hqdefault.jpg)" data-trailer="${tr.key}" data-inline aria-label="Play trailer"><span>▶ Play trailer</span></button></section>`:''}
+  ${AD('detail-inline')}
+  <section><h2>Cast</h2><div class="row cast">${cast.map(c=>`<div class="p"><img loading="lazy" src="${c.profile_path?IMG+'w185'+c.profile_path:PH}" alt=""><b>${esc(c.name)}</b><br><small>${esc(c.character)}</small></div>`).join('')}</div></section>
+  <section class="txt"><h2>Your rating & review</h2>
+    <div class="stars" data-key="${key}">${[1,2,3,4,5].map(i=>`<button class="${i<=my?'on':''}" data-s="${i}" aria-label="${i} stars">★</button>`).join('')}</div>
+    <form id="cf" data-key="${key}"><input name="n" placeholder="Your name" required maxlength="40" style="margin-bottom:.5rem"><textarea name="t" rows="3" placeholder="Write a short review" required maxlength="500"></textarea><button class="btn" style="margin-top:.5rem">Post review</button></form>
+    <div id="cms">${cms.map(c=>`<div class="cm"><small>${esc(c.n)} · ${esc(c.d)}</small><p>${esc(c.t)}</p></div>`).join('')}</div>
+    <small style="color:var(--mu)">Reviews are saved in this browser. Connect a backend (Supabase/Firebase) to share them across users.</small></section>
+  ${rel.length?rowSec('You may also like',rel,t):''}`;
+  const v=ls('views',0)+1;save('views',v);if(v>=3)popup();
+}
+
+async function browse(){
+  const q=new URLSearchParams(location.search),g=await genres(),yrs=[...Array(40)].map((_,i)=>new Date().getFullYear()-i);
+  const opt=(a,sel)=>a.map(([v,l])=>`<option value="${v}" ${String(sel)===String(v)?'selected':''}>${l}</option>`).join('');
+  setMeta({title:'Browse & Search Movies and Web Series | Frameroom',desc:'Filter by genre, language, year and rating.'});
+  app.innerHTML=`<section><h1 style="font-size:3rem">Browse</h1><form class="f" id="bf">
+    <input name="q" placeholder="Search title" value="${esc(q.get('q')||'')}" style="grid-column:1/-1">
+    <select name="type">${opt([['movie','Movies'],['tv','Web series']],q.get('type')||'movie')}</select>
+    <select name="genre">${opt([['','Any genre'],...[...g]],q.get('genre')||'')}</select>
+    <select name="lang">${opt([['','Any language'],['en','English'],['hi','Hindi'],['ta','Tamil'],['te','Telugu'],['ml','Malayalam'],['ko','Korean'],['ja','Japanese'],['es','Spanish'],['fr','French']],q.get('lang')||'')}</select>
+    <select name="year">${opt([['','Any year'],...yrs.map(y=>[y,y])],q.get('year')||'')}</select>
+    <select name="rating">${opt([['','Any rating'],[6,'6+'],[7,'7+'],[8,'8+']],q.get('rating')||'')}</select>
+    <select name="sort">${opt([['popularity.desc','Most popular'],['vote_average.desc','Top rated'],['primary_release_date.desc','Newest']],q.get('sort')||'popularity.desc')}</select>
+    <button class="btn" style="grid-column:1/-1">Apply filters</button></form>
+    <div class="grid" id="res"></div><div class="msg" id="st"></div><button class="btn g" id="more" hidden>Load more</button></section>${AD('browse-bottom')}`;
+  let page=1;const t=q.get('type')||'movie';
+  const load=async()=>{
+    let r;const dt=t==='tv'?'first_air_date':'primary_release_date';
+    if(q.get('q'))r=await api('/search/'+t,{query:q.get('q'),page});
+    else{const p={page,sort_by:q.get('sort')||'popularity.desc','vote_count.gte':q.get('sort')?.startsWith('vote')||q.get('rating')?200:20};
+      if(q.get('genre'))p.with_genres=q.get('genre');if(q.get('lang'))p.with_original_language=q.get('lang');
+      if(q.get('year'))p[t==='tv'?'first_air_date_year':'primary_release_year']=q.get('year');
+      if(q.get('rating'))p['vote_average.gte']=q.get('rating');
+      if(q.get('sort')?.includes('date'))p[dt+'.lte']=new Date().toISOString().slice(0,10);
+      r=await api('/discover/'+t,p)}
+    let items=r.results.filter(m=>m.poster_path);
+    if(q.get('q')){const lg=q.get('lang'),yr=q.get('year'),rt=+q.get('rating')||0,gn=+q.get('genre');
+      items=items.filter(m=>(!lg||m.original_language===lg)&&(!yr||year(m)===yr)&&m.vote_average>=rt&&(!gn||m.genre_ids.includes(gn)))}
+    $('#res').insertAdjacentHTML('beforeend',items.map(m=>card(m,t)).join(''));
+    $('#st').textContent=$('#res').children.length?'':'No titles match. Try removing a filter.';
+    $('#more').hidden=page>=r.total_pages;
+  };
+  $('#bf').onsubmit=e=>{e.preventDefault();nav('/browse?'+new URLSearchParams([...new FormData(e.target)].filter(x=>x[1])))};
+  $('#more').onclick=()=>{page++;load()};await load();
+}
+
+/* Blog / News */
+const POSTS=[
+  {s:'how-to-pick-what-to-watch-tonight',t:'How to pick what to watch tonight in 5 minutes',b:['Start with the mood, not the genre: do you want to be thrilled, comforted or challenged?','Then set a runtime ceiling. A 100-minute film beats a 10-episode commitment on a weeknight.','Finally, check the rating and the "Where to watch" list so you only consider what you can stream now.']},
+  {s:'best-limited-series-to-binge',t:'Limited series worth binging in a weekend',b:['Limited series give you a full story with no cliffhanger for next season.','Browse web series sorted by rating, filter 8+, and add three to your watchlist.']},
+  {s:'what-we-look-for-in-a-review',t:'How we rate: what a Frameroom review covers',b:['Story, performances, craft and rewatch value. Spoiler-free, always.','Replace this placeholder with your own editorial reviews and top-10 lists.']}];
+async function blog(s){
+  const p=POSTS.find(x=>x.s===s);
+  if(p){setMeta({title:p.t+' | Frameroom',desc:p.b[0]});
+    app.innerHTML=`<article class="txt"><h1>${esc(p.t)}</h1><br>${p.b.map(x=>`<p>${esc(x)}</p>`).join('')}${AD('article')}<a class="btn" href="/blog" data-l>All news</a></article>`;return}
+  const [top,up]=await Promise.all([api('/trending/movie/week'),api('/movie/upcoming',{region:CFG.REGION})]);
+  setMeta({title:'Movie News, Reviews, Top 10 Lists & Release Calendar | Frameroom',desc:'Reviews, weekly top 10 and upcoming release dates.'});
+  const by=[...up.results].sort((a,b)=>a.release_date>b.release_date?1:-1);
+  app.innerHTML=`<section><h1 style="font-size:3rem">News & Lists</h1></section>
+  <section class="txt"><h2>Reviews & guides</h2>${POSTS.map(x=>`<p><a href="/blog/${x.s}" data-l><b>${esc(x.t)}</b></a></p>`).join('')}</section>
+  <section class="txt"><h2>Top 10 movies this week</h2><ol class="t10">${top.results.slice(0,10).map(m=>`<li><a href="/movie/${m.id}-${slug(m.title)}" data-l>${esc(m.title)} <small style="color:var(--mu)">★ ${m.vote_average.toFixed(1)}</small></a></li>`).join('')}</ol></section>${AD('blog')}
+  <section class="txt cal"><h2>Release calendar</h2><ul style="padding:0">${by.map(m=>`<li><time datetime="${m.release_date}">${new Date(m.release_date+'T00:00').toLocaleDateString(undefined,{month:'short',day:'numeric'})}</time><a href="/movie/${m.id}-${slug(m.title)}" data-l>${esc(m.title)}</a></li>`).join('')}</ul></section>`;
+}
+
+function watchlist(){
+  setMeta({title:'My Watchlist | Frameroom',desc:'Titles you saved to watch later.'});const l=wl();
+  app.innerHTML=`<section><h1 style="font-size:3rem">Watchlist</h1><br>${l.length?`<div class="grid">${l.map(m=>card({id:m.id,title:m.title,poster_path:m.poster,release_date:m.y,vote_average:0},m.t).replace(/<span class="rt">.*?<\/span>/,'')).join('')}</div>`:'<div class="msg">Nothing saved yet. Open any title and tap “+ Watchlist”.</div>'}</section>`;
+}
+
+/* Static pages */
+const PAGES={
+  about:['About Frameroom','<p>Frameroom helps you decide what to watch: trending titles, honest ratings, trailers and where to stream them.</p><p>We do not host or stream any video.</p>'],
+  contact:['Contact',`<p>Questions, press or partnerships? Send a note.</p><form action="${CFG.CONTACT}" method="POST"><input name="email" type="email" required placeholder="Your email" style="margin-bottom:.5rem"><textarea name="message" rows="5" required placeholder="Message"></textarea><button class="btn" style="margin-top:.5rem">Send message</button></form>`],
+  privacy:['Privacy Policy','<p>We use Google Analytics to measure traffic, and local storage in your browser to save your watchlist, ratings and preferences. If you subscribe, we store your email to send the newsletter; unsubscribe any time.</p><p>Third parties (ad networks, affiliate partners, TMDB) may set cookies. We do not sell personal data. Contact us to request deletion.</p>'],
+  dmca:['DMCA / Copyright','<p>Frameroom does not host copyrighted video. Posters and metadata come from TMDB. To report infringing content, email your name, the URL, a description of the work and a good-faith statement to the address on our Contact page. We respond within 5 business days.</p>']};
+function page(k){const[t,b]=PAGES[k];setMeta({title:t+' | Frameroom',desc:t});app.innerHTML=`<article class="txt"><h1>${t}</h1><br>${b}</article>`}
+
+/* ================= ROUTER ================= */
+const nav=u=>{history.pushState(0,'',u);route()};
+async function route(){
+  const p=location.pathname.replace(/\/$/,'')||'/',[,a,b]=p.split('/');scrollTo(0,0);
+  document.querySelectorAll('#nav a').forEach(x=>x.classList.toggle('on',x.getAttribute('href')===(p==='/'?'/':'/'+a)));
+  if(CFG.KEY.startsWith('YOUR_')){app.innerHTML='<div class="msg"><h2>Add your TMDB API key</h2>Open index.html and set CFG.KEY.</div>';return}
+  app.innerHTML='<div class="msg">Loading…</div>';
+  try{
+    if(p==='/'||p==='/index.html')await home();else if(a==='movie'||a==='tv')await detail(a,parseInt(b));
+    else if(a==='browse')await browse();else if(a==='blog')await blog(b);else if(a==='watchlist')watchlist();
+    else if(PAGES[a])page(a);else app.innerHTML='<div class="msg"><h2>Page not found</h2><a class="btn" href="/" data-l>Back home</a></div>';
+    track('page_view',{page_path:location.pathname+location.search,page_title:document.title});
+  }catch(e){app.innerHTML='<div class="msg"><h2>Couldn’t load this page</h2>Check your connection or TMDB key, then reload.</div>'}
+}
+addEventListener('popstate',route);
+
+/* ================= GLOBAL EVENTS ================= */
+document.addEventListener('click',e=>{
+  const l=e.target.closest('a[data-l]');
+  if(l&&!e.metaKey&&!e.ctrlKey){e.preventDefault();nav(l.getAttribute('href'));return}
+  const tr=e.target.closest('[data-trailer]');
+  if(tr){const f=`<iframe src="https://www.youtube-nocookie.com/embed/${tr.dataset.trailer}?autoplay=1" allow="autoplay;encrypted-media;fullscreen" title="Trailer"></iframe>`;
+    if(tr.hasAttribute('data-inline'))tr.outerHTML=f;else{$('#pop div').innerHTML=f+'<br><button class="btn g" id="x2">Close</button>';$('#pop').classList.add('on');$('#x2').onclick=()=>location.reload()}
+    track('trailer_play');return}
+  const w=e.target.closest('[data-wl]');
+  if(w){const a=JSON.parse(w.dataset.wl);toggleWl(...a);w.textContent=inWl(a[0],a[1])?'✓ In watchlist':'+ Watchlist';return}
+  const s=e.target.closest('.stars button');
+  if(s){const k=s.parentNode.dataset.key;save('r:'+k,+s.dataset.s);[...s.parentNode.children].forEach((b,i)=>b.classList.toggle('on',i<+s.dataset.s));return}
+  const sh=e.target.closest('[data-share]');
+  if(sh){navigator.share?navigator.share({title:sh.dataset.share,url:location.href}):navigator.clipboard.writeText(location.href).then(()=>sh.textContent='Link copied');track('share')}
+});
+document.addEventListener('submit',e=>{
+  const f=e.target;
+  if(f.id==='sf'){e.preventDefault();const q=new FormData(f).get('q').trim();if(q)nav('/browse?q='+encodeURIComponent(q))}
+  if(f.id==='cf'){e.preventDefault();const k=f.dataset.key,d=new FormData(f),c=ls('c:'+k,[]);c.unshift({n:d.get('n'),t:d.get('t'),d:new Date().toLocaleDateString()});save('c:'+k,c);route()}
+  if(f.hasAttribute('data-nl')){e.preventDefault();const em=f.querySelector('input').value;
+    const done=()=>{f.innerHTML='<b>Thanks — check your inbox.</b>';save('nl',1);track('newsletter_signup');setTimeout(()=>$('#pop').classList.remove('on'),1500)};
+    CFG.NEWSLETTER?fetch(CFG.NEWSLETTER,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email:em})}).then(done).catch(done):(save('email',em),done())}
+});
+
+/* Email popup: after engagement */
+function popup(){if(ls('nl',0)||ls('dismiss',0)||$('#pop').classList.contains('on'))return;$('#pop').classList.add('on')}
+$('#x').onclick=()=>{save('dismiss',1);$('#pop').classList.remove('on')};
+setTimeout(popup,45000);
+addEventListener('scroll',()=>{if(scrollY/(document.body.scrollHeight-innerHeight)>.6)popup()},{passive:true,once:true});
+
+/* Push opt-in (permission only; real push needs a service worker + provider) */
+$('#push').onclick=async()=>{if(!('Notification' in window))return alert('Notifications are not supported in this browser.');
+  const r=await Notification.requestPermission();if(r==='granted'){new Notification('Frameroom',{body:'You’ll get release alerts.'});track('push_optin')}};
+
+route();
+</script>
+</body>
+</html>
